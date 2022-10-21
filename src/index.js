@@ -47,7 +47,7 @@ function onClick(e) {
   e.preventDefault();
   page = 1;
   query = e.target.searchQuery.value.trim();
-  downloadImage((firstBoot = true));
+  downloadImage(true);
 }
 
 // -----------   Infinite scroll ---------------------------------------------
@@ -58,7 +58,7 @@ function fetchImages(entries) {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       page += 1;
-      downloadImage((firstBoot = false));
+      downloadImage(false);
     }
   });
 }
