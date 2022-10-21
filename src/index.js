@@ -1,4 +1,3 @@
-import './css/main.css';
 import { fetchApi } from './js/fetchImagesApi';
 import cardTml from './templates/card.hbs';
 
@@ -7,6 +6,8 @@ import { Loading } from 'notiflix/build/notiflix-loading-aio';
 
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+
+import './css/main.css';
 
 // -------------------------------------------------------------
 
@@ -22,7 +23,7 @@ const guard = document.querySelector('.guard');
 // ---- IntersectionObserve -------------------------------------
 const options = {
   root: null,
-  rootMargin: '5px',
+  rootMargin: '50px',
   threshold: 0,
 };
 const observe = new IntersectionObserver(fetchImages, options);
@@ -33,67 +34,78 @@ const lightboxOptions = {
   captionDelay: 250,
 };
 
-let lightbox = null;
 lightbox = new SimpleLightbox('.gallery a', lightboxOptions);
-//------------------------------------------------------------------
+
+//------------------ addEventListener  --------------------------------------
 
 buttonRef.addEventListener('submit', onClick);
 
-// ------------ Вывод первых  фоток  -----------------------------
+// ------------ Вывод первых  фоток  -----------------------------------------
 function onClick(e) {
   e.preventDefault();
   page = 1;
   query = e.target.searchQuery.value.trim();
-
-  Loading.standard('Loading...');
-
-  fetchApi(query)
-    .then(json => {
-      if (json.hits.length === 0) {
-        errorMessage();
-        imageDivRef.innerHTML = '';
-        return;
-      }
-      //  render html
-      imageDivRef.innerHTML = cardTml(json.hits);
-
-      //  refresh lightbox
-      lightbox.refresh();
-
-      // Если картинок приходит мало и блок guard находится близко,
-      // срабатывает IntersectionObserver и идет слудующий вызов API
-      if (json.totalHits > numberOfPhotosPerPage) {
-        observe.observe(guard);
-      }
-    })
-    .catch(() => {
-      console.log('Error');
-    })
-    .finally(() => Loading.remove());
+  downloadImage((firstBoot = true));
 }
 
-// -----------   Infinite scroll ------------------------------
+// -----------   Infinite scroll ---------------------------------------------
+//  IntersectionObserver отслеживает растояние до <div class="guard"></div>
+//  Функцию fetchImages в нужный момент вызывает observe.observe(guard)
+//  и в параметры передает массив объектов entries
 function fetchImages(entries) {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       page += 1;
-
-      Loading.standard('Loading...');
-
-      fetchApi(query, numberOfPhotosPerPage, page)
-        .then(json => {
-          //  render html
-          imageDivRef.insertAdjacentHTML('beforeend', cardTml(json.hits));
-          //  refresh lightbox
-          lightbox.refresh();
-
-          if (json.hits.length === 0) {
-            observe.unobserve(guard);
-          }
-        })
-        .finally(() => Loading.remove());
+      downloadImage((firstBoot = false));
     }
   });
+}
+
+// ------------ Download Images function ------------------------------------------
+function downloadImage(firstBoot) {
+  Loading.standard('Loading...');
+
+  fetchApi(query, numberOfPhotosPerPage, page)
+    .then(json => {
+      // Если запрос вернул пустую строку
+      if (json.totalHits === 0) {
+        errorMessage();
+        buttonRef.reset(); // очистка поля ввода
+        imageDivRef.innerHTML = '';
+        return;
+      }
+
+      console.log(json);
+      // Если загружаються первые 40 изображений firstBoot = true
+      if (firstBoot) {
+        // Сообщение о количестве найденых фото
+        infoOfTotalHits(json.totalHits);
+        //   innerHTML
+        imageDivRef.innerHTML = cardTml(json.hits);
+      } else {
+        //  insertAdjacentHTML
+        imageDivRef.insertAdjacentHTML('beforeend', cardTml(json.hits));
+      }
+
+      //  refresh lightbox
+      lightbox.refresh();
+
+      // Если картинок приходит мало, то блок <div class="guard"></div> находится зоне отслеживания,
+      // что приводит к срабатыванию IntersectionObserver и идет слудующий вызов API
+      //  observe.observe(guard) запускается при условии, что изображений больше numberOfPhotosPerPage
+      if (firstBoot && json.totalHits > numberOfPhotosPerPage) {
+        observe.observe(guard);
+      }
+
+      if (json.hits.length < numberOfPhotosPerPage) {
+        observe.unobserve(guard);
+      }
+    })
+    .catch(() => {
+      imageDivRef.innerHTML = '';
+      console.log('Error');
+    })
+    .finally(() => Loading.remove());
 }
 
 // -------------  Error message -----------------------------------
@@ -101,4 +113,12 @@ function errorMessage() {
   Notify.failure(
     '"Sorry, there are no images matching your search query. Please try again."'
   );
+}
+
+// ----- message about total hits ------------------------------
+function infoOfTotalHits(totalHits) {
+  Notify.success(`Hooray! We found ${totalHits} images.`, {
+    timeout: 4000,
+    showOnlyTheLastOne: true,
+  });
 }

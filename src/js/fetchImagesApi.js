@@ -8,7 +8,7 @@ function fetchApi(guery, per_page = 40, page = 1) {
     per_page,
     image_type: 'photo',
     orientation: 'horizontal',
-    safesearch: false,
+    safesearch: true,
     page,
   });
 

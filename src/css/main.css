@@ -2,8 +2,9 @@ header {
   height: 60px;
 }
 body {
-  background-image: url('../images/background.png');
-  background-position: center 0px;
+  /* background-image: url('../images/background.png');
+  background-position: center 0px; */
+  background-color: #2f2f2f;
 }
 
 .container {
@@ -22,7 +23,7 @@ body {
 }
 .gallery {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
   gap: 10px;
 }
@@ -59,4 +60,22 @@ body {
 }
 .spinner {
   height: 70px;
+}
+
+.sl-overlay {
+  background-color: #2f2f2f;
+}
+.sl-wrapper .sl-counter {
+  color: #fff;
+}
+
+.sl-wrapper .sl-navigation button {
+  color: #fff;
+}
+.sl-wrapper .sl-close {
+  color: #fff;
+}
+
+.footer-section {
+  color: #fff;
 }
