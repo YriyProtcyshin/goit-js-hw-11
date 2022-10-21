@@ -1,5 +1,6 @@
 import { fetchApi } from './js/fetchImagesApi';
 import cardTml from './templates/card.hbs';
+import throttle from 'lodash.throttle';
 
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { Loading } from 'notiflix/build/notiflix-loading-aio';
@@ -19,12 +20,13 @@ const numberOfPhotosPerPage = 40;
 const imageDivRef = document.querySelector('.gallery');
 const buttonRef = document.querySelector('#search-form');
 const guard = document.querySelector('.guard');
+const footerSection = document.querySelector('.footer-section');
 
 // ---- IntersectionObserve -------------------------------------
 const options = {
   root: null,
-  rootMargin: '50px',
-  threshold: 0,
+  rootMargin: '0px',
+  threshold: 1,
 };
 const observe = new IntersectionObserver(fetchImages, options);
 
@@ -99,6 +101,7 @@ function downloadImage(firstBoot) {
 
       if (json.hits.length < numberOfPhotosPerPage) {
         observe.unobserve(guard);
+        footerSection.removeAttribute('hidden');
       }
     })
     .catch(() => {
@@ -121,4 +124,11 @@ function infoOfTotalHits(totalHits) {
     timeout: 4000,
     showOnlyTheLastOne: true,
   });
+}
+
+document.addEventListener('scroll', throttle(scrollOn, 250));
+
+function scrollOn() {
+  const scrollY = window.scrollY || document.documentElement.scrollTop;
+  console.log(scrollY);
 }

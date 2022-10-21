@@ -12,7 +12,7 @@ function fetchApi(guery, per_page = 40, page = 1) {
     page,
   });
 
-  console.log(`${url}?${searchParams}`);
+  // console.log(`${url}?${searchParams}`);
 
   return fetch(`${url}?${searchParams}`).then(response => {
     if (!response.ok) {
