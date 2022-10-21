@@ -36,7 +36,7 @@ const lightboxOptions = {
   captionDelay: 250,
 };
 
-lightbox = new SimpleLightbox('.gallery a', lightboxOptions);
+let lightbox = new SimpleLightbox('.gallery a', lightboxOptions);
 
 //------------------ addEventListener  --------------------------------------
 
