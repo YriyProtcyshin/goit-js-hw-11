@@ -21,6 +21,7 @@ const imageDivRef = document.querySelector('.gallery');
 const buttonRef = document.querySelector('#search-form');
 const guard = document.querySelector('.guard');
 const footerSection = document.querySelector('.footer-section');
+const topBtn = document.querySelector('.topBtn');
 
 // ---- IntersectionObserve -------------------------------------
 const options = {
@@ -47,6 +48,7 @@ function onClick(e) {
   e.preventDefault();
   page = 1;
   query = e.target.searchQuery.value.trim();
+  footerSection.setAttribute('hidden', true);
   downloadImage(true);
 }
 
@@ -126,9 +128,20 @@ function infoOfTotalHits(totalHits) {
   });
 }
 
+// ======== button to TOP ============================================
 document.addEventListener('scroll', throttle(scrollOn, 250));
 
 function scrollOn() {
   const scrollY = window.scrollY || document.documentElement.scrollTop;
-  console.log(scrollY);
+
+  if (scrollY > 50) {
+    topBtn.style.display = 'block';
+  } else {
+    topBtn.style.display = 'none';
+  }
 }
+
+topBtn.addEventListener('click', () => {
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+});
