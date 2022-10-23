@@ -10,62 +10,71 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 
 import './css/main.css';
 
-// -------------------------------------------------------------
+// global variables
 
 let page = 1;
 let query = '';
 const numberOfPhotosPerPage = 40;
+let firstBoot = true;
 
-// ---------- REF ----------------------------------------------
+// links on html elements
 const imageDivRef = document.querySelector('.gallery');
 const buttonRef = document.querySelector('#search-form');
 const guard = document.querySelector('.guard');
 const footerSection = document.querySelector('.footer-section');
 const topBtn = document.querySelector('.topBtn');
 
-// ---- IntersectionObserve -------------------------------------
+//  *** IntersectionObserve ***
 const options = {
   root: null,
   rootMargin: '0px',
-  threshold: 1,
+  threshold: 0.5,
 };
 const observe = new IntersectionObserver(fetchImages, options);
 
-// ----------- SimpleLightbox -------------------------------------
+// *** SimpleLightbox ***
 const lightboxOptions = {
   captionsData: 'alt',
   captionDelay: 250,
 };
-
 let lightbox = new SimpleLightbox('.gallery a', lightboxOptions);
 
-//------------------ addEventListener  --------------------------------------
+//======================== addEventListener  ==============================
 
+document.addEventListener('scroll', throttle(scrollOn, 250));
 buttonRef.addEventListener('submit', onClick);
+topBtn.addEventListener('click', onTopBtn);
 
-// ------------ Вывод первых  фоток  -----------------------------------------
+// =========================================================================
+
+//  Вывод первых  фоток при клике
 function onClick(e) {
   e.preventDefault();
   page = 1;
   query = e.target.searchQuery.value.trim();
-  footerSection.setAttribute('hidden', true);
-  downloadImage(true);
+  console.log(query);
+  if (!query) {
+    errorMessage();
+    return;
+  }
+  downloadImage(firstBoot);
 }
 
-// -----------   Infinite scroll ---------------------------------------------
+//  *** Infinite scroll ***
 //  IntersectionObserver отслеживает растояние до <div class="guard"></div>
 //  Функцию fetchImages в нужный момент вызывает observe.observe(guard)
 //  и в параметры передает массив объектов entries
+
 function fetchImages(entries) {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       page += 1;
-      downloadImage(false);
+      downloadImage((firstBoot = false));
     }
   });
 }
 
-// ------------ Download Images function ------------------------------------------
+//  Download Images function --
 function downloadImage(firstBoot) {
   Loading.standard('Loading...');
 
@@ -79,9 +88,10 @@ function downloadImage(firstBoot) {
         return;
       }
 
-      console.log(json);
       // Если загружаються первые 40 изображений firstBoot = true
       if (firstBoot) {
+        // скрываю секцию html
+        footerSection.setAttribute('hidden', true);
         // Сообщение о количестве найденых фото
         infoOfTotalHits(json.totalHits);
         //   innerHTML
@@ -100,27 +110,28 @@ function downloadImage(firstBoot) {
       if (firstBoot && json.totalHits > numberOfPhotosPerPage) {
         observe.observe(guard);
       }
-
+      console.log(json.hits.length);
       if (json.hits.length < numberOfPhotosPerPage) {
+        console.log('observe.unobserve');
         observe.unobserve(guard);
         footerSection.removeAttribute('hidden');
       }
     })
     .catch(() => {
       imageDivRef.innerHTML = '';
-      console.log('Error');
+      console.log('Error !!!  ');
     })
     .finally(() => Loading.remove());
 }
 
-// -------------  Error message -----------------------------------
+//  Error message
 function errorMessage() {
   Notify.failure(
     '"Sorry, there are no images matching your search query. Please try again."'
   );
 }
 
-// ----- message about total hits ------------------------------
+// message about total hits
 function infoOfTotalHits(totalHits) {
   Notify.success(`Hooray! We found ${totalHits} images.`, {
     timeout: 4000,
@@ -128,12 +139,10 @@ function infoOfTotalHits(totalHits) {
   });
 }
 
-// ======== button to TOP ============================================
-document.addEventListener('scroll', throttle(scrollOn, 250));
-
+// отслеживание скролинга вверх и вниз
 function scrollOn() {
   const scrollY = window.scrollY || document.documentElement.scrollTop;
-
+  // отображение кнопки
   if (scrollY > 50) {
     topBtn.style.display = 'block';
   } else {
@@ -141,7 +150,8 @@ function scrollOn() {
   }
 }
 
-topBtn.addEventListener('click', () => {
+// при нажатии на кнопку вверх
+function onTopBtn() {
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
-});
+}
