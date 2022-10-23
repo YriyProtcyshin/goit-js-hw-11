@@ -111,7 +111,13 @@ function downloadImage(firstBoot) {
         observe.observe(guard);
       }
       console.log(json.hits.length);
-      if (json.hits.length < numberOfPhotosPerPage) {
+
+      console.log(page);
+      console.log(
+        'json.hits.length < numberOfPhotosPerPage && page > 12',
+        json.hits.length < numberOfPhotosPerPage || page > 12
+      );
+      if (json.hits.length < numberOfPhotosPerPage || page > 12) {
         console.log('observe.unobserve');
         observe.unobserve(guard);
         footerSection.removeAttribute('hidden');
