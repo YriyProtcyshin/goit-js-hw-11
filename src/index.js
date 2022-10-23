@@ -52,7 +52,7 @@ function onClick(e) {
   e.preventDefault();
   page = 1;
   query = e.target.searchQuery.value.trim();
-  console.log(query);
+
   if (!query) {
     errorMessage();
     return;
@@ -110,13 +110,7 @@ function downloadImage(firstBoot) {
       if (firstBoot && json.totalHits > numberOfPhotosPerPage) {
         observe.observe(guard);
       }
-      console.log(json.hits.length);
 
-      console.log(page);
-      console.log(
-        'json.hits.length < numberOfPhotosPerPage && page > 12',
-        json.hits.length < numberOfPhotosPerPage || page > 12
-      );
       if (json.hits.length < numberOfPhotosPerPage || page > 12) {
         console.log('observe.unobserve');
         observe.unobserve(guard);
