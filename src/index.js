@@ -57,7 +57,7 @@ function onClick(e) {
     errorMessage();
     return;
   }
-  downloadImage(firstBoot);
+  downloadImage((firstBoot = true));
 }
 
 //  *** Infinite scroll ***
@@ -80,9 +80,11 @@ function downloadImage(firstBoot) {
 
   fetchApi(query, numberOfPhotosPerPage, page)
     .then(json => {
+      console.log(json);
       // Если запрос вернул пустую строку
       if (json.totalHits === 0) {
         errorMessage();
+        observe.unobserve(guard);
         buttonRef.reset(); // очистка поля ввода
         imageDivRef.innerHTML = '';
         return;
@@ -112,13 +114,11 @@ function downloadImage(firstBoot) {
       }
 
       if (json.hits.length < numberOfPhotosPerPage || page > 12) {
-        console.log('observe.unobserve');
         observe.unobserve(guard);
         footerSection.removeAttribute('hidden');
       }
     })
     .catch(() => {
-      imageDivRef.innerHTML = '';
       console.log('Error !!!  ');
     })
     .finally(() => Loading.remove());
