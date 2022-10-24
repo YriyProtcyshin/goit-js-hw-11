@@ -109,49 +109,14 @@ main {
   height: 46px;
   width: 300px;
   background: #2f2f2f;
-  /* border: 1px solid #fff; */
+  border: 1px solid #fff;
   border-radius: 40px;
   padding: 2px 20px;
   position: relative;
   z-index: 99;
   overflow: hidden;
 }
-/* 
-form::before {
-  z-index: -10;
-  content: '';
-  width: 321px;
-  height: 45px;
-  background: linear-gradient(#0000, #ff3c7b, #ff3c7b, #ff3c7b, #0000);
 
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-
-  animation: animate 6s linear infinite;
-}
-
-@keyframes animate {
-  0% {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-
-  100% {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
-}
-
-form::after {
-  content: '';
-  height: 42px;
-  width: 296px;
-  z-index: -1;
-  background: #292929;
-  border-radius: 40px;
-  position: absolute;
-  inset: 2px;
-} */
 .searchButton {
   width: 40px;
   height: 40px;
